@@ -1,0 +1,32 @@
+##################################
+#
+# ANSIBLE DEPLOYMENT SCRIPT
+# Upgrade only listed packages  
+# 
+# By Johan Chassaing
+#
+##################################
+
+- hosts: all
+
+  user: vagrant
+  sudo: yes
+
+  vars:
+    # packages allowed to be upgraded
+    - to_upgrade: [ 'apache2-mpm-worker', 'apache2.2-bin', 'apache2.2-common' ]
+
+  tasks:
+    - name: Update packages list
+      apt: update_cache=yes
+
+    - name: List packages to upgrade 
+      shell: aptitude -q -F%p --disable-columns search "~U"
+      register: updates
+
+    - name: Upgrade
+      apt: name={{ item }} state=latest
+#      debug: msg="Package to update:{{item}}"
+      with_items: updates.stdout_lines
+      when: item in to_upgrade
+
