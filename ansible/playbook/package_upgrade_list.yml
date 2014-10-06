@@ -7,26 +7,39 @@
 #
 ##################################
 
+##################
+#
+# How to:
+#   ansible-playbook -i <hosts-file> package_upgrade_list.yml
+# 
+# Dependencies
+#   - packages.yml , the list of packages allowed to be upgraded
+#
+#################
+
 - hosts: all
 
-  user: vagrant
-  sudo: yes
+  # for root
+  user: root
 
-  vars:
-    # packages allowed to be upgraded
-    - to_upgrade: [ 'apache2-mpm-worker', 'apache2.2-bin', 'apache2.2-common' ]
+  # for specific user
+  #user: vagrant
+  #sudo: yes
 
   tasks:
+    - include_vars: "packages.yml"
+
     - name: Update packages list
       apt: update_cache=yes
+      when: ansible_os_family == 'Debian'
 
-    - name: List packages to upgrade 
+    - name: List packages to upgrade
       shell: aptitude -q -F%p --disable-columns search "~U"
       register: updates
+      when: ansible_os_family == 'Debian'
 
     - name: Upgrade
       apt: name={{ item }} state=latest
-#      debug: msg="Package to update:{{item}}"
-      with_items: updates.stdout_lines
-      when: item in to_upgrade
+      with_items: updates.stdout_lines | intersect(to_upgrade)
+      when: ansible_os_family == 'Debian'
 

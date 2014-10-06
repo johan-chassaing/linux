@@ -1,0 +1,14 @@
+##################################
+#
+# This file is a dependency of 
+# package_upgrade_list.yml playbook
+# 
+# By Johan Chassaing
+#
+##################################
+
+to_upgrade:
+  - apt
+  - apt-utils
+  - bind9-host
+  - curl
