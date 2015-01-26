@@ -25,7 +25,6 @@ try:
     import sys
     import supervisor.supervisorctl
 except ImportError:
-    e=dir(ImportError)
     print "CRITICAL | Modules importation error"    
     sys.exit(2)
 
