@@ -1,0 +1,18 @@
+- name: Get server timezone
+  tags: timezone
+  shell: cat /etc/timezone
+  register: server_timezone
+  changed_when: False
+
+- name: Set timezone
+  tags: timezone
+  copy: content={{ timezone_to_set }}
+        dest=/etc/timezone
+        owner=root
+        group=root
+        mode=0644
+        backup=yes
+  notify:
+    - update timezone
+  when:
+    server_timezone.stdout != timezone_to_set
