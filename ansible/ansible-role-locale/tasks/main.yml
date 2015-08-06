@@ -1,0 +1,28 @@
+# locale
+
+- name: get locale list
+  tags: locale
+  shell: locale -a
+  register: locale_list
+  changed_when: False
+
+
+- debug: var={{ item }}
+  tags: locale
+  with_items: locale_to_install | difference(locale_list.stdout_lines) 
+
+- name: add locale not present
+  tags: locale
+  locale_gen: name={{ item }} state=present
+  with_items: locale_to_install | difference(locale_list.stdout_lines)
+
+- name: show locale which should be removed
+  tags: locale
+  debug: var={{ item }}
+  with_items: locale_list.stdout_lines | difference(locale_to_install)
+  failed_when: item is defined
+  when: locale_list_to_remove == True
+
+- name: set locale
+  tags: locale
+  template: src=locale.j2 dest=/etc/default/locale

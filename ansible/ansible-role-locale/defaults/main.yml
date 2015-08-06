@@ -1,0 +1,26 @@
+locale_list_to_remove: False 
+
+locale_to_install:
+  - C
+  - C.UTF-8
+  - en_GB.utf8
+  - en_US.utf8
+  - fr_FR.utf8
+  - POSIX 
+
+locale_vars:
+  lang: "fr_FR.UTF-8"
+  language:
+  lc_all:
+  lc_address:
+  lc_collate:
+  lc_ctype:
+  lc_identification:
+  lc_measurement:
+  lc_messages:
+  lc_monetary:
+  lc_name:
+  lc_numeric:
+  lc_paper: 
+  lc_telephone:
+  lc_time:
