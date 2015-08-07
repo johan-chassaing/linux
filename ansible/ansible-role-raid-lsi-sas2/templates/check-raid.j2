@@ -1,0 +1,10 @@
+#!/bin/bash
+   
+mailAddr="{{ raid_mailto }}"
+raidStatus=`/usr/sbin/sas2ircu-status`
+raidCritical="Critical - raid status - $HOSTNAME"
+
+if ! echo $raidStatus | grep -q Okay; then
+  echo "$raidCritical"
+  echo -e "${raidCritical}\n\n ${raidStatus}" | mailx -s "$raidCritical" $mailAddr
+fi

@@ -1,0 +1,16 @@
+- name: add hwraid repository
+  tags: raid_lsi_sas2
+  template: 
+    src=apt-repo.j2 
+    dest="/etc/apt/sources.list.d/hwraid.le-vert.net.list"
+
+- name: install package sas2ircu-status
+  tags: raid_lsi_sas2
+  apt: name="sas2ircu-status" update_cache=yes state=present
+
+- name: add hourly check
+  tags: raid_lsi_sas2
+  template:
+    src=check-raid.j2
+    dest="/etc/cron.hourly/check-raid"
+    mode="755"
