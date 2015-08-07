@@ -1,0 +1,28 @@
+ntp_service: "ntp"
+
+# Servers
+ntp_servers:
+  - 0.debian.pool.ntp.org iburst
+  - 1.debian.pool.ntp.org iburst
+  - 2.debian.pool.ntp.org iburst
+  - 3.debian.pool.ntp.org iburst
+
+# Stats
+ntp_stats_enable: False
+ntp_stats_path: "/var/log/ntpstats/"
+
+# Restrictions
+ntp_restriction: 
+  - "-4 default kod notrap nomodify nopeer noquery"
+  - "-6 default kod notrap nomodify nopeer noquery"
+  - "127.0.0.1"
+  - "::1"
+
+# Broadcast to local network
+ntp_broadcast: False
+ntp_broadcast_networks:
+ - 192.168.0.255
+
+# Listen time broadcast
+ntp_disable_auth: False
+ntp_broadcastclient: False

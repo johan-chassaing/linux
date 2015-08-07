@@ -1,0 +1,16 @@
+# NTP
+- name: install package
+  tags: ntp
+  apt: pkg=ntp state=present
+
+- name: configure ntp 
+  tags: ntp
+  template: 
+    src=ntp.conf.j2 
+    dest=/etc/ntp.conf.test
+  notify:
+    - restart ntp
+
+- name: Is running and start on boot
+  tags: ntp
+  service: name=ntp state=running enabled=yes
