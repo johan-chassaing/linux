@@ -1,0 +1,10 @@
+# Name
+- name: Set name
+  tags: hostname
+  hostname: name={{ hostname }}
+
+- name: Set hosts file
+  tags: hostname
+  template: 
+    src=hosts.j2 
+    dest=/etc/hosts
