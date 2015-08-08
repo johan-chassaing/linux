@@ -3,10 +3,16 @@
   template: 
     src=apt-repo.j2 
     dest="/etc/apt/sources.list.d/hwraid.le-vert.net.list"
+  register: raid_repo
+
+- name: update package list
+  tags: raid_lsi_sas2
+  apt: update_cache=yes
+  when: raid_repo.changed
 
 - name: install package sas2ircu-status
   tags: raid_lsi_sas2
-  apt: name="sas2ircu-status" update_cache=yes state=present
+  apt: name="sas2ircu-status" state=present
 
 - name: add hourly check
   tags: raid_lsi_sas2
