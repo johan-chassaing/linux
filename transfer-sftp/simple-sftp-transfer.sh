@@ -56,6 +56,8 @@ compress_ext="zip"
 hash_prog="$(which sha1sum)"
 hash_ext="sha1"
 
+set -o pipefail
+
 ##########################################
 #
 #               Functions
@@ -69,19 +71,17 @@ hash_ext="sha1"
 
 function sftp_cmd (){ 
 
-    echo_log "$1 file $2/$3 to/from server ${dst_account}@${dst_server}:${dst_port}" | tee -a "$log"
+    echo_log "$1 file $2/$3 to/from server ${dst_account}@${dst_server}:${dst_port}"
 
-    # SFTP RC > 0 only for connection error
-    sftp -o PreferredAuthentications=publickey -o ConnectTimeout=$ssh_timeout -P ${dst_port} ${dst_account}@${dst_server} >> "$log" 2>&1 <<END_SFTP
-cd $2
-$1 $3
-quit
-END_SFTP
+    sftp -o PreferredAuthentications=publickey -o ConnectTimeout=$ssh_timeout -b - \
+         -P ${dst_port} ${dst_account}@${dst_server} 2>&1 <<< "$1 $3 $2/$3" | tee -a "$log" 
 
+    RC="$?"
     ## check SFTP return code
-    if [[ "$?" -ne "0" ]]; then
-        echo "Error connecting to server ${dst_account}@${dst_server}:${dst_port}" | tee -a "$log"
-        return 1
+    if [[ "$RC" -ne "0" ]]; then
+        echo_log "Error with the SFTP connection on ${dst_account}@${dst_server}:${dst_port}"
+        echo_log "Error sftp return code = $RC"
+        error_code=$RC
     else
         return 0
     fi
@@ -131,7 +131,7 @@ check_path "$log_path"
 
 # Flush logs after LogMaxDay reached
 echo_log "Flush logs"
-find "$log_path" -name "${prog_name}-*log" -type f -mtime +$log_max_day -print -delete | tee -a "$log"
+find "$log_path" -name "${prog_name}-*log" -type f -mtime +$log_max_day -print -delete 2>&1 | tee -a "$log"
 
 # Enter in work directory
 cd "${work_path}" >> "$log" 2>&1 || exit_on_error "1" "Error entering in ${work_path}"
@@ -176,19 +176,8 @@ for item in $items; do
     sftp_cmd "put" "${dst_path}" "${current_item_name}"
     
     if [[ "$?" -eq "0" ]]; then
-        echo_log "SFTP connection ok for file ${current_item_name}"
-    else
-        echo_log "Error SFTP connection KO for file ${current_item_name}"
-        error_code=1
-    fi
-
-    # send hash files to the remote server
-    sftp_cmd "put" "${dst_path}" "${current_item_name}.${hash_ext}"
-    
-    if [[ "$?" -eq "0" ]]; then
-        echo_log "SFTP connection ok for file ${current_item_name}.${hash_ext}"
-    else
-        echo_log "Error SFTP connection KO for file ${current_item_name}.${hash_ext}"
+        # send hash files to the remote server
+        sftp_cmd "put" "${dst_path}" "${current_item_name}.${hash_ext}"
     fi
 
     # remove compressed file
@@ -203,5 +192,5 @@ for item in $items; do
 done
 
 # exiting with ErrorCode as RC
-exit "$error_code"
+exit_on_error "$error_code" "End"
 
