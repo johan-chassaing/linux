@@ -33,6 +33,9 @@
 prog_name="transfert-sftp"
 datetime="$(date +%Y%m%d-%H%M%S%2N)"
 
+# Files pattern:
+file_pattern="*.CSV"
+
 # Destination SFTP server
 dst_server="127.0.0.1"
 dst_port="22"
@@ -82,9 +85,8 @@ function sftp_cmd (){
         echo_log "Error with the SFTP connection on ${dst_account}@${dst_server}:${dst_port}"
         echo_log "Error sftp return code = $RC"
         error_code=$RC
-    else
-        return 0
     fi
+    return $RC
 }
 
 ##### exit_on_error
@@ -138,7 +140,7 @@ cd "${work_path}" >> "$log" 2>&1 || exit_on_error "1" "Error entering in ${work_
 echo_log "Entering in ${work_path}"
 
 # select items, avoid .${hash_ext} and compressed files
-items=$(find . -maxdepth 1 -type f -name "*.CSV")
+items=$(find . -maxdepth 1 -type f -name "$file_pattern")
 
 echo_log "items: $items"
 
