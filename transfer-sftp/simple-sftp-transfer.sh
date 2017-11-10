@@ -142,9 +142,6 @@ items=$(find . -maxdepth 1 -type f -name "*.CSV")
 
 echo_log "items: $items"
 
-# Archives
-cp -v ./*.CSV "${archives_path}/" 2>&1 | tee -a "$log"
-
 error_code=0
 
 # process files
