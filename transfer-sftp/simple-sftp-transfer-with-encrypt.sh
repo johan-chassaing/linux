@@ -13,7 +13,6 @@
 #
 #  Script to send files to an SFTP server
 #  User uses public key
-#  copy all CSV files to Archives
 #  process done file by file:
 #      crypt CSV
 #      hash CSV
